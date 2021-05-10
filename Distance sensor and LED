@@ -1,0 +1,30 @@
+import smbus
+import time
+ 
+# Define some constants from the datasheet
+DEVICE = 0x23 # Default device I2C address
+ 
+bus = smbus.SMBus(1)  # Rev 2 Pi uses 1
+ 
+def readLight(addr=DEVICE):
+  data = bus.read_i2c_block_data(addr,DEVICE)
+  result = (data[1] + (256 * data[0])) / 1.2
+  return result
+
+try:
+    while 1:
+        lightlevel = readLight()
+        print("Light level = %.2f lux" %lightlevel)
+        if(lightlevel <= 20):
+            print("Too Dark")
+        elif(lightlevel <= 40):
+            print("Dark")
+        elif(lightlevel <= 60):
+            print("Medium")
+        elif(lightlevel <= 80):
+            print("Bright")
+        else:
+            print("Too Bright")
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Stop")
